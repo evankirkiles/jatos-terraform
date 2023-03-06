@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  jatos:
+    image: "jatos/jatos"
+    ports:
+      - "9000:9000"
+    # environment:
+    #   - JATOS_DB_URL=jdbc:mysql://db:3306/jatos?characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+    #   - JATOS_DB_USERNAME=user
+    #   - JATOS_DB_PASSWORD=some_secret_password
+    #   - JATOS_DB_DRIVER=com.mysql.cj.jdbc.Driver
+    volumes:
+      - ./result_uploads:/opt/docker/result_uploads
+      - ./study_assets_root:/opt/docker/study_assets_root
+  # db:
+  #   image: mysql
+  #   ports:
+  #     - '3306:3306'
+  #   expose:
+  #     - '3306'
+  #   environment:
+  #     - MYSQL_HOST=mysql
+  #     - MYSQL_DATABASE=jatos
+  #     - MYSQL_USER=user
+  #     - MYSQL_PASSWORD=some_secret_password
+  #     - MYSQL_ROOT_PASSWORD=some_secret_password_2

@@ -1,0 +1,49 @@
+#cloud-config
+write_files:
+  - path: /run/jatos/jatos.service
+    owner: root:root
+    encoding: "gzip+base64"
+    permissions: "0644"
+    content: ${FILE_JATOS_SERVICE}
+  - path: /run/jatos/nginx.conf
+    owner: root:root
+    encoding: "gzip+base64"
+    permissions: "0644"
+    content: ${FILE_NGINX_CONF}
+  - path: /run/jatos/production.conf
+    owner: root:root
+    encoding: "gzip+base64"
+    permissions: "0644"
+    content: ${FILE_JATOS_CONF}
+  - path: /run/jatos/initmounts.sh
+    owner: root:root
+    encoding: "gzip+base64"
+    permissions: "0755"
+    content: ${FILE_INIT_MOUNTS}
+  - path: /run/jatos/initssl.sh
+    owner: root:root
+    encoding: "gzip+base64"
+    permissions: "0755"
+    content: ${FILE_INIT_SSL}
+runcmd:
+  # Mount the EBS volumes
+  - /run/jatos/initmounts.sh sdh /study_assets 1
+  - /run/jatos/initmounts.sh sdi /result_uploads ${RESULT_UPLOADS_ENABLED}
+  # Perform installations of nginx and JATOS
+  - amazon-linux-extras install -y nginx1
+  - cd /home/ec2-user/
+  - wget https://github.com/JATOS/JATOS/releases/latest/download/jatos_linux_java.zip
+  - unzip jatos_linux_java.zip
+  - rm jatos_linux_java.zip
+  # Move our cloud-config files into their actual locations
+  - mv /run/jatos/production.conf /home/ec2-user/jatos_linux_java/conf/production.conf
+  - mv /run/jatos/jatos.service /etc/systemd/system/jatos.service
+  - mv /run/jatos/nginx.conf /etc/nginx/nginx.conf
+  # Begin systemd processes for serving JATOS
+  - systemctl daemon-reload
+  - systemctl enable --no-block nginx 
+  - systemctl start --no-block nginx 
+  - systemctl enable --no-block jatos.service 
+  - systemctl start --no-block jatos.service 
+  # Run SSL setup if SSL is enabled
+  - /run/jatos/initssl.sh ${SSL_DOMAIN_NAME} ${SSL_REGISTER_EMAIL} ${SSL_ENABLED}

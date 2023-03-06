@@ -1,0 +1,11 @@
+[Unit]
+Description=JATOS
+After=network-online.target
+
+[Service]
+PIDFile=/home/ec2-user/jatos_linux_java/RUNNING_PID
+ExecStart=/home/ec2-user/jatos_linux_java/loader.sh start
+ExecStop=/bin/kill $MAINPID
+ExecStopPost=/bin/rm -f /home/ec2-user/jatos_linux_java/RUNNING_PID
+Restart=on-failure
+RestartSec=5
