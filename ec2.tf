@@ -19,7 +19,6 @@ module "dev_ssh_sg" {
 }
 
 # Allow HTTP connections (ports :80 and :443) to the JATOS EC2 instance. 
-# In actuality, the ALB will handle HTTPS encryption, so 443 will never be used.
 module "ec2_sg" {
   source      = "terraform-aws-modules/security-group/aws"
   name        = replace("${local.prefix}_ec2_sg", "-", "_")
@@ -34,7 +33,7 @@ module "ec2_sg" {
 /* ------------------------------- Cloud init ------------------------------- */
 
 # We use Cloud Init to set up our Jatos instance in the AWS EC2 repo from a 
-# fresh Amazon Linux 2 install.
+# fresh Amazon Linux 2 install. We also configure the mounts and SSL.
 data "cloudinit_config" "jatos_config" {
   gzip          = true
   base64_encode = true
@@ -75,7 +74,7 @@ data "aws_ami" "amazon_linux_2" {
   }
 }
 
-# EC2 instance with Jatos installed through userdata (see templates/userdata.sh)
+# EC2 instance with Jatos installed through userdata
 resource "aws_instance" "main" {
   ami           = data.aws_ami.amazon_linux_2.id
   instance_type = "t3.micro"
