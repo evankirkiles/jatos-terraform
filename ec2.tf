@@ -126,5 +126,5 @@ module "key_pair" {
 # Output the .pem to a local file
 resource "local_file" "private_key" {
   content  = module.key_pair.private_key_pem
-  filename = "ssl/jatos.pem"
+  filename = "ssh/jatos.pem"
 }
